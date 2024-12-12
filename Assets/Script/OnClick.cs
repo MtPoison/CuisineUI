@@ -9,6 +9,9 @@ public class OnClick : MonoBehaviour
     [SerializeField] private GameObject canvasDrop;
     [SerializeField] private Player player;
     [SerializeField] private Book book;
+    [SerializeField] private PlayerControl playerControl;
+    [SerializeField] private GameObject canvasPlayer;
+    [SerializeField] private GameObject canvasPop;
     void Start()
     {
         
@@ -51,5 +54,12 @@ public class OnClick : MonoBehaviour
     public void Previous()
     {
         book.RecettePrecedente();
+    }
+
+    public void Left()
+    {
+        canvasPop.SetActive(false);
+        canvasPlayer.SetActive(true);
+        playerControl.IsReading();
     }
 }
