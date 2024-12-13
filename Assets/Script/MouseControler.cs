@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class MouseControler : MonoBehaviour
@@ -7,6 +8,7 @@ public class MouseControler : MonoBehaviour
     private GameObject selectObject;
     private Material originalMaterial;
     private Material outlineMaterial;
+    RaycastHit hit;
 
     [SerializeField] private GameObject player;
 
@@ -31,35 +33,17 @@ public class MouseControler : MonoBehaviour
     void Update()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
+        
 
         int layer1Mask = 1 << LayerMask.NameToLayer("Food");
         int layer2Mask = 1 << LayerMask.NameToLayer("Recipiant");
+        Raycast(ray, hit, layer1Mask, MoveCanva, canvasTake);
+        Raycast(ray, hit, layer2Mask, MoveCanva, canvasDrop);
+    }
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, layer1Mask))
-        {
-            if (hoveredObject != hit.collider.gameObject)
-            {
-                if (hoveredObject != null)
-                {
-                    RemoveOutline(hoveredObject);
-                }
-
-                hoveredObject = hit.collider.gameObject;
-                ApplyOutline(hoveredObject);
-            }
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                print("c'est bon");
-                if (hoveredObject != null)
-                {
-                    selectObject = hoveredObject;
-                    MoveCanva(selectObject, canvasTake);
-                }
-            }
-        }
-        else if (Physics.Raycast(ray, out hit, Mathf.Infinity, layer2Mask))
+    private void Raycast(Ray ray, RaycastHit hit, int layerMask, Action<GameObject, GameObject> canvas, GameObject type)
+    {
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
         {
             if (hoveredObject != hit.collider.gameObject)
             {
@@ -77,7 +61,7 @@ public class MouseControler : MonoBehaviour
                 if (hoveredObject != null)
                 {
                     selectObject = hoveredObject;
-                    MoveCanva(selectObject, canvasDrop);
+                    canvas(selectObject, type);
                 }
             }
         }
@@ -89,9 +73,7 @@ public class MouseControler : MonoBehaviour
                 hoveredObject = null;
             }
         }
-
     }
-
     void ApplyOutline(GameObject obj)
     {
         originalMaterial = obj.GetComponent<Renderer>().material;

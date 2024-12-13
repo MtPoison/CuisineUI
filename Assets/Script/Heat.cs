@@ -44,7 +44,6 @@ public class SliderToParticles : MonoBehaviour
             emissionModule.rateOverTime = particleCount;
             mainModule.startSpeed = Mathf.Lerp(1f, 10f, value);
             mainModule.startSize = Mathf.Lerp(0.1f, 2f, value);
-            count.text = $"{(int) Mathf.Lerp(0f, 100f, value)}";
             Vector3 currentRotation = button.transform.rotation.eulerAngles;
             button.transform.rotation = Quaternion.Euler(currentRotation.x, currentRotation.y, Mathf.Lerp(-90f, 90f, value));
         }
@@ -53,6 +52,5 @@ public class SliderToParticles : MonoBehaviour
             emissionModule.enabled = false;
         }
 
-        Debug.Log("Valeur Slider : " + value + " | Particules actives : " + emissionModule.enabled);
     }
 }

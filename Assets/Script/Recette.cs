@@ -9,7 +9,7 @@ public class Recette : ScriptableObject
     public string nomDeLaRecette;
 
     [Tooltip("Liste des ingrédients requis pour la recette")]
-    public List<string> ingredients;
+    public string ingredients;
 
     [Tooltip("Instructions à suivre pour préparer la recette")]
     [TextArea(5, 10)]

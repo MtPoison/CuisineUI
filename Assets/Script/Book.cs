@@ -4,15 +4,27 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.Windows;
 
 public class Book : MonoBehaviour
 {
+    public string saveFolder = "Assets/Scriptable";
+
+    private bool cast = true;
+
     [SerializeField] List<Recette> recettes;
     [SerializeField] PlayerControl playerControl;
+
+    [Header("Input Field")]
+    [SerializeField] public TMP_InputField titleInputField;
+    [SerializeField] public TMP_InputField descriptionInputField;
+    [SerializeField] public TMP_InputField authorInputField;
+
+    [Header("Canvas")]
     [SerializeField] GameObject canvasPlayer;
     [SerializeField] Canvas canvas;
     [SerializeField] GameObject canvasPopUp;
-
+    [SerializeField] GameObject canvasAdd;
 
     [Header("TextMeshPro")]
     [Tooltip("TextMeshPro pour afficher le nom de la recette")]
@@ -31,6 +43,7 @@ public class Book : MonoBehaviour
 
     private void Start()
     {
+        LoadRecettes();
         AfficherRecette(indexActuel, nomRecetteText, ingredientsText, preparationText);
     }
 
@@ -51,7 +64,8 @@ public class Book : MonoBehaviour
         Recette recetteActuelle = recettes[index];
 
         nomRecette.text = recetteActuelle.nomDeLaRecette;
-        ingredients.text = string.Join(",\n", recetteActuelle.ingredients);
+        string[] mots = recetteActuelle.ingredients.Split(' ');
+        ingredients.text = string.Join("\n", mots);
         preparation.text = recetteActuelle.preparation;
     }
 
@@ -64,38 +78,116 @@ public class Book : MonoBehaviour
     {
         indexActuel = (indexActuel + 1) % recettes.Count;
         AfficherRecette(indexActuel, nomRecetteText, ingredientsText, preparationText);
+        print(indexActuel);
     }
 
     public void RecettePrecedente()
     {
         indexActuel = (indexActuel - 1 + recettes.Count) % recettes.Count; 
         AfficherRecette(indexActuel, nomRecetteText, ingredientsText, preparationText);
+        print(indexActuel);
     }
 
     private void SelectRecette()
     {
-        if (Input.GetMouseButtonDown(0))
+        if(cast)
         {
-            PointerEventData pointerData = new PointerEventData(EventSystem.current)
+            print(cast);
+            int layerMask = 1 << LayerMask.NameToLayer("Tv");
+            if (UnityEngine.Input.GetMouseButtonDown(0))
             {
-                position = Input.mousePosition
-            };
-
-            List<RaycastResult> results = new List<RaycastResult>();
-
-            GraphicRaycaster raycaster = canvas.GetComponent<GraphicRaycaster>();
-            if (raycaster != null)
-            {
-                raycaster.Raycast(pointerData, results);
-
-                if (results.Count > 0)
+                PointerEventData pointerData = new PointerEventData(EventSystem.current)
                 {
-                    playerControl.IsReading();
-                    canvasPlayer.SetActive(false);
-                    canvasPopUp.SetActive(true);
-                    AfficherRecette(indexActuel, nomRecetteTextPop, ingredientsTextPop, preparationTextPop);
+                    position = UnityEngine.Input.mousePosition
+                };
+
+                List<RaycastResult> results = new List<RaycastResult>();
+
+                GraphicRaycaster raycaster = canvas.GetComponent<GraphicRaycaster>();
+                if (raycaster != null)
+                {
+                    raycaster.Raycast(pointerData, results);
+
+                    bool isButtonClicked = results.Exists(result => result.gameObject.GetComponent<Button>() != null);
+                    bool isLayerCorrect = results.Exists(result => result.gameObject.layer == layerMask);
+
+                    if (!isButtonClicked && !isLayerCorrect && results.Count > 0)
+                    {
+                        playerControl.IsReading();
+                        canvasPlayer.SetActive(false);
+                        canvasPopUp.SetActive(true);
+                        AfficherRecette(indexActuel, nomRecetteTextPop, ingredientsTextPop, preparationTextPop);
+                    }
                 }
             }
         }
+    }
+
+    public void RemoveRecette()
+    {
+        recettes.RemoveAt(indexActuel);
+        PlayerPrefs.DeleteKey(saveFolder + "/Recette" + indexActuel + "_nom");
+        PlayerPrefs.DeleteKey(saveFolder + "/Recette" + indexActuel + "_ingredients");
+        PlayerPrefs.DeleteKey(saveFolder + "/Recette" + indexActuel + "_preparation");
+
+        SaveRecettes();
+    }
+
+    public void IsRecast( bool active)
+    {
+        cast = active;
+    }
+
+    public void AddRecette()
+    {
+        cast = false;
+        Recette newTextData = ScriptableObject.CreateInstance<Recette>();
+
+        newTextData.nomDeLaRecette = titleInputField.text;
+        newTextData.ingredients = descriptionInputField.text;
+        newTextData.preparation = authorInputField.text;
+
+        if (!Directory.Exists(saveFolder))
+        {
+            Directory.CreateDirectory(saveFolder);
+        }
+        recettes.Add( newTextData );
+        SaveRecettes();
+
+        ClearInputFields();
+    }
+
+    private void SaveRecettes()
+    {
+        for (int i = 0; i < recettes.Count; i++)
+        {
+            PlayerPrefs.SetString(saveFolder + "/Recette" + i + "_nom", recettes[i].nomDeLaRecette);
+            PlayerPrefs.SetString(saveFolder + "/Recette" + i + "_ingredients", recettes[i].ingredients);
+            PlayerPrefs.SetString(saveFolder + "/Recette" + i + "_preparation", recettes[i].preparation);
+        }
+        PlayerPrefs.Save();
+    }
+
+    private void LoadRecettes()
+    {
+        int index = 0;
+        while (PlayerPrefs.HasKey(saveFolder + "/Recette" + index + "_nom"))
+        {
+            Recette loadedRecette = ScriptableObject.CreateInstance<Recette>();
+
+            loadedRecette.nomDeLaRecette = PlayerPrefs.GetString(saveFolder + "/Recette" + index + "_nom");
+            loadedRecette.ingredients = PlayerPrefs.GetString(saveFolder + "/Recette" + index + "_ingredients");
+            loadedRecette.preparation = PlayerPrefs.GetString(saveFolder + "/Recette" + index + "_preparation");
+
+            recettes.Add(loadedRecette);
+            index++;
+        }
+    }
+
+    private void ClearInputFields()
+    {
+        titleInputField.text = string.Empty;
+        descriptionInputField.text = string.Empty;
+        authorInputField.text = string.Empty;
     }
 }

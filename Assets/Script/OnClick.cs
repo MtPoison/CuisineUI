@@ -4,14 +4,22 @@ using UnityEngine;
 
 public class OnClick : MonoBehaviour
 {
+
+    [SerializeField] private Book book;
+
+    [Header("Player")]
     [SerializeField] private MouseControler mouse;
+    [SerializeField] private Player player;
+    [SerializeField] private PlayerControl playerControl;
+
+    [Header("Input Field")]
     [SerializeField] private GameObject canvasTake;
     [SerializeField] private GameObject canvasDrop;
-    [SerializeField] private Player player;
-    [SerializeField] private Book book;
-    [SerializeField] private PlayerControl playerControl;
     [SerializeField] private GameObject canvasPlayer;
     [SerializeField] private GameObject canvasPop;
+    [SerializeField] private GameObject canvasAdd;
+
+    
     void Start()
     {
         
@@ -59,7 +67,29 @@ public class OnClick : MonoBehaviour
     public void Left()
     {
         canvasPop.SetActive(false);
+        canvasAdd.SetActive(false);
         canvasPlayer.SetActive(true);
         playerControl.IsReading();
+        book.IsRecast(true);
+    }
+
+    public void AddRecipe()
+    {
+        canvasAdd.SetActive(true);
+        canvasPlayer.SetActive(false);
+        playerControl.IsReading();
+
+        book.IsRecast(false);
+    }
+
+    public void SaveRecipe()
+    {
+        book.AddRecette();
+        book.IsRecast(true);
+    }
+
+    public void SupRecipe()
+    {
+        book.RemoveRecette();
     }
 }

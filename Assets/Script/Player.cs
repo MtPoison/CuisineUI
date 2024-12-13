@@ -10,17 +10,6 @@ public class Player : MonoBehaviour
     private GameObject RightHand;
     private Rigidbody rb;
 
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
     public void Add(GameObject obj, string hand)
     {
         if(hand == "left")
@@ -33,7 +22,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void Remove(GameObject obj, string hand) 
+    public void Remove( string hand) 
     {
         if (hand == "left")
         {
@@ -68,10 +57,11 @@ public class Player : MonoBehaviour
         Debug.Log($"{obj.name} a été ajouté en tant qu'enfant du joueur.");
     }
 
-    public void Switch(GameObject obj, GameObject hand, Vector3 position)
+    public void Switch(GameObject obj, GameObject handGO, Vector3 position, string hand)
     {
-        GameObject tmp = hand;
+        GameObject tmp = handGO;
         Drop(tmp);
+        Remove(hand);
         AddAsChild(obj, position);
     }
 
@@ -104,7 +94,7 @@ public class Player : MonoBehaviour
         rb.isKinematic = true;
         if(Verrify(hand))
         {
-            Switch(obj, ItemHand(hand), position);
+            Switch(obj, ItemHand(hand), position, hand);
         }
         else
         {
@@ -123,6 +113,7 @@ public class Player : MonoBehaviour
             Drop(ItemHand(hand));
             tmp.transform.SetParent(obj.transform);
             tmp.transform.localPosition = position;
+            Remove(hand);
         }
         else
         {
