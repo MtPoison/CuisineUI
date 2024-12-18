@@ -88,15 +88,11 @@ public class MouseControler : MonoBehaviour
 
     void MoveCanva(GameObject target, GameObject _canvas)
     {
-        print(_canvas);
         if (_canvas != null && target != null)
         {
             _canvas.SetActive(true);
-            Vector3 canvasPosition = new Vector3(
-               target.transform.position.x,
-               target.transform.position.y + 1f,
-               target.transform.position.z
-           );
+            Vector3 canvasPosition = target.transform.position - target.transform.right * 1.5f;
+            canvasPosition.y += 1f;
 
             _canvas.transform.position = canvasPosition;
 

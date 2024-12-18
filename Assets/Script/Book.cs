@@ -92,7 +92,6 @@ public class Book : MonoBehaviour
     {
         if(cast)
         {
-            print(cast);
             int layerMask = 1 << LayerMask.NameToLayer("Tv");
             if (UnityEngine.Input.GetMouseButtonDown(0))
             {

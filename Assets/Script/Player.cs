@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
         {
             LeftHand = obj;
         }
-        else
+        else if(hand == "right") 
         {
             RightHand = obj;
         }
@@ -40,7 +40,7 @@ public class Player : MonoBehaviour
         {
             return true;
         }
-        else if (hand == "right" && LeftHand != null)
+        else if (hand == "right" && RightHand != null)
         {
             return true;
         }
@@ -80,7 +80,7 @@ public class Player : MonoBehaviour
             {
                 return LeftHand;
             }
-            else
+            else if( hand == "right" )
             {
                 return RightHand;
             }

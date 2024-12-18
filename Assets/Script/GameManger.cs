@@ -8,6 +8,7 @@ public class GameManger : MonoBehaviour
     [SerializeField] private GameObject canvas;
     [SerializeField] private GameObject canvasHeat;
     [SerializeField] private GameObject player;
+    private GameObject item;
     void Start()
     {
         canvas.SetActive(false);
@@ -26,4 +27,15 @@ public class GameManger : MonoBehaviour
         }
     }
 
+    public void SetItem(GameObject _item)
+    {
+        item = _item;
+    }
+
+    public GameObject GetItem() { return item; }
+
+    public void SetItemNull()
+    {
+        item = null;
+    }
 }

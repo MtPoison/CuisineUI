@@ -50,7 +50,7 @@ public class OnClick : MonoBehaviour
 
     public void LaidRight()
     {
-        player.DropHande(mouse.GetSelectObject(), "left", new Vector3(0,5,0));
+        player.DropHande(mouse.GetSelectObject(), "right", Vector3.up * 5);
         canvasDrop.SetActive(false);
     }
 

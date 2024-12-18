@@ -46,6 +46,7 @@ public class SliderToParticles : MonoBehaviour
             mainModule.startSize = Mathf.Lerp(0.1f, 2f, value);
             Vector3 currentRotation = button.transform.rotation.eulerAngles;
             button.transform.rotation = Quaternion.Euler(currentRotation.x, currentRotation.y, Mathf.Lerp(-90f, 90f, value));
+            count.text = $"{ (int)Mathf.Lerp(0f, 100f, value)}";
         }
         else
         {
