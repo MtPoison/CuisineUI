@@ -12,14 +12,20 @@ public class OnClick : MonoBehaviour
     [SerializeField] private Player player;
     [SerializeField] private PlayerControl playerControl;
 
-    [Header("Input Field")]
+    [Header("Canvas")]
     [SerializeField] private GameObject canvasTake;
     [SerializeField] private GameObject canvasDrop;
     [SerializeField] private GameObject canvasPlayer;
     [SerializeField] private GameObject canvasPop;
     [SerializeField] private GameObject canvasAdd;
+    [SerializeField] private GameObject canvasStore;
 
-    
+
+    [Header("Store")]
+    [SerializeField] private Inv inv;
+
+    private GameObject tmp;
+
     void Start()
     {
         
@@ -68,6 +74,7 @@ public class OnClick : MonoBehaviour
     {
         canvasPop.SetActive(false);
         canvasAdd.SetActive(false);
+        canvasStore.SetActive(false);
         canvasPlayer.SetActive(true);
         playerControl.IsReading();
         book.IsRecast(true);
@@ -91,5 +98,27 @@ public class OnClick : MonoBehaviour
     public void SupRecipe()
     {
         book.RemoveRecette();
+    }
+
+    public void DropStoreLeft()
+    {
+        tmp = player.ItemHand("left");
+        inv.Drop(player.ItemHand("left"), "left");
+        Destroy(tmp);
+    }
+
+    public void DropStoreRight()
+    {
+        tmp = player.ItemHand("right");
+        inv.Drop(player.ItemHand("right"), "right");
+        Destroy(tmp);
+    }
+
+    public void Open()
+    {
+        canvasStore.SetActive(true);
+        canvasPlayer.SetActive(true);
+        playerControl.IsReading();
+        book.IsRecast(true);
     }
 }

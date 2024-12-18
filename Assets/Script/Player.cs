@@ -72,7 +72,7 @@ public class Player : MonoBehaviour
         rb.isKinematic = false;
     }
 
-    private GameObject ItemHand(string hand)
+    public GameObject ItemHand(string hand)
     {
         if(Verrify(hand))
         {

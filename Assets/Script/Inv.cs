@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
-using static Inv;
 
 
 
@@ -14,6 +13,7 @@ public class Inv : MonoBehaviour
     public class NestedList
     {
         public List<ItemData> innerList;
+        public void Add(ItemData item) { innerList.Add(item); }
     }
 
     [SerializeField] private Button buttonPrefab;
@@ -28,60 +28,79 @@ public class Inv : MonoBehaviour
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private GameManger game;
     [SerializeField] private GameObject text;
+    [SerializeField] private Player player;
+
+    private bool update = false;
 
     private List<Button> buttonList = new List<Button>();
     private List<GameObject> itemsAliment = new List<GameObject>();
+    [SerializeField] private List<ItemData> totalItem = new List<ItemData>();
 
     void Start()
     {
         GenerateUI();
+        CreateButton();
+    }
+
+
+    public void CreateButton()
+    {
+        ClearButtons();
         for (int i = 0; i < outerList.Count; i++)
         {
-            CreateButton($"Button {i + 1}", i);
+            Button newButton = Instantiate(buttonPrefab, parentTransform);
+
+            Text buttonLabel = newButton.GetComponentInChildren<Text>();
+            if (buttonLabel != null)
+            {
+                buttonLabel.text = $"bouton_{i}";
+            }
+            ShelfButton shel = newButton.GetComponent<ShelfButton>();
+            shel.SetShel(itemsAliment[i]);
+            shel.SetTitleText(titleText);
+            shel.SetDescription(descriptionText);
+            shel.SetGame(game);
+            buttonList.Add(newButton);
         }
     }
-    
 
-    public void CreateButton(string buttonText, int i)
+    private void Update()
     {
-        Button newButton = Instantiate(buttonPrefab, parentTransform);
-
-        Text buttonLabel = newButton.GetComponentInChildren<Text>();
-        if (buttonLabel != null)
+        if (update)
         {
-            buttonLabel.text = buttonText;
+            GenerateUI();
+            CreateButton();
+            update = false;
         }
-        ShelfButton shel = newButton.GetComponent<ShelfButton>();
-        shel.SetShel(itemsAliment[i]);
-        shel.SetTitleText(titleText);
-        shel.SetDescription(descriptionText);
-        shel.SetGame(game);
-        buttonList.Add(newButton);
     }
 
     void GenerateUI()
     {
+        ClearUI();
         for (int i = 0; i < outerList.Count; i++)
         {
             NestedList nestedList = outerList[i];
             GameObject container = Instantiate(containerPrefab, parentTransformItem);
-            container.SetActive(false);
-            for (int j = 0; j < nestedList.innerList.Count; j++)
+
+            foreach (ItemData itemData in nestedList.innerList)
             {
                 GameObject buttonGO = Instantiate(buttonPrefabItem, container.transform);
-                buttonGO.name = $"Button_{i}_{j}";
-                
+                buttonGO.name = $"Button_{i}_{nestedList.innerList.IndexOf(itemData)}";
+                print(buttonGO.name);
+                if (!HasDigitInName(buttonGO.name))
+                {
+                    print("okk");
+                    buttonGO.SetActive(false);
+                }
 
                 AlimentSlot alimentSlot = buttonGO.GetComponent<AlimentSlot>();
-                alimentSlot.SetTitleText(titleText);
-                alimentSlot.SetDescription(descriptionText);
-                alimentSlot.SetText(text);
-                alimentSlot.SetGame(game);
                 if (alimentSlot != null)
                 {
-                    ItemData itemData = nestedList.innerList[j];
+                    alimentSlot.SetTitleText(titleText);
+                    alimentSlot.SetDescription(descriptionText);
+                    alimentSlot.SetText(text);
+                    alimentSlot.SetGame(game);
                     alimentSlot.SetAlimentData(itemData);
-                    
                 }
                 else
                 {
@@ -89,29 +108,73 @@ public class Inv : MonoBehaviour
                 }
             }
             itemsAliment.Add(container);
+            foreach (Transform child in container.transform)
+            {
+                if (!HasDigitInName(child.name))
+                {
+                    print($"Child '{child.name}' does not contain a digit. Removing...");
+                    Destroy(child.gameObject);
+                }
+            }
         }
     }
 
-    GameObject CreateContainer(string name, Transform parent)
+    bool HasDigitInName(string name)
     {
-        GameObject container = new GameObject(name);
-        container.transform.SetParent(parent);
+        foreach (char c in name)
+        {
+            if (char.IsDigit(c))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
-        RectTransform rectTransform = container.AddComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(240,210);
-        rectTransform.localPosition = new Vector3(120, -305, 0);
-        rectTransform.localScale = Vector3.one;
+    void ClearUI()
+    {
+        foreach (GameObject container in itemsAliment)
+        {
+            Destroy(container);
+        }
+        itemsAliment.Clear();
+    }
 
-        GridLayoutGroup gridLayout = container.AddComponent<GridLayoutGroup>();
-        gridLayout.cellSize = new Vector2(100, 100);
-        gridLayout.spacing = new Vector2(10, 10);
-        gridLayout.padding = new RectOffset(30, 0, 0, 0);
+    public void ClearButtons()
+    {
+        foreach (Button button in buttonList)
+        {
+            Destroy(button.gameObject);
+        }
+        buttonList.Clear();
+    }
 
-        ContentSizeFitter fitter = container.AddComponent<ContentSizeFitter>();
-        fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-        return container;
+
+    public void Drop(GameObject data, string hand)
+    {
+        if (player.Verrify(hand))
+        {
+            print(outerList.Count);
+            for (int i = 0; i < totalItem.Count; i++)
+            {
+                /*print(totalItem[i].prefab);
+                print(data);*/
+                if (data.name == totalItem[i].prefab.name)
+                {
+                    int rand = Random.Range(0, outerList.Count);
+
+                    outerList[rand].Add(totalItem[i]);
+                    player.Remove(hand);
+                    update = true;
+                    return;
+                }
+                /*else
+                {
+                    print("this Object can't store");
+                }*/
+            }
+        }
     }
 }

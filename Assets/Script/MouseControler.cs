@@ -14,6 +14,8 @@ public class MouseControler : MonoBehaviour
 
     [SerializeField] private GameObject canvasTake;
     [SerializeField] private GameObject canvasDrop;
+    [SerializeField] private GameObject canvasStore;
+
     [SerializeField] private float distanceAhead = 2.0f;
     [SerializeField] private float heightOffset = 150;
     [SerializeField] private float distanceLeft = 2.0f;
@@ -37,13 +39,15 @@ public class MouseControler : MonoBehaviour
 
         int layer1Mask = 1 << LayerMask.NameToLayer("Food");
         int layer2Mask = 1 << LayerMask.NameToLayer("Recipiant");
+        int layer3Mask = 1 << LayerMask.NameToLayer("Store");
         Raycast(ray, hit, layer1Mask, MoveCanva, canvasTake);
         Raycast(ray, hit, layer2Mask, MoveCanva, canvasDrop);
+        Raycast(ray, hit, layer3Mask, MoveCanva, canvasStore);
     }
 
-    private void Raycast(Ray ray, RaycastHit hit, int layerMask, Action<GameObject, GameObject> canvas, GameObject type)
+    private void Raycast(Ray _ray, RaycastHit hit, int layerMask, Action<GameObject, GameObject> canvas, GameObject type)
     {
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
+        if (Physics.Raycast(_ray, out hit, Mathf.Infinity, layerMask))
         {
             if (hoveredObject != hit.collider.gameObject)
             {
