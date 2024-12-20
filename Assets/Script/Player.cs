@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using UnityEditor;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour
 
     public void Remove( string hand) 
     {
+        print("enlever");
         if (hand == "left")
         {
             LeftHand = null;
@@ -54,6 +56,7 @@ public class Player : MonoBehaviour
 
         obj.transform.localPosition = position;
 
+
         Debug.Log($"{obj.name} a été ajouté en tant qu'enfant du joueur.");
     }
 
@@ -63,12 +66,15 @@ public class Player : MonoBehaviour
         Drop(tmp);
         Remove(hand);
         AddAsChild(obj, position);
+        Add(obj, hand);
     }
 
     public void Drop(GameObject obj)
     {
+        print("coucou");
         obj.transform.parent = null;
         obj.GetComponent<Collider>().enabled = true;
+        rb = obj.GetComponent<Rigidbody>();
         rb.isKinematic = false;
     }
 
@@ -92,8 +98,9 @@ public class Player : MonoBehaviour
     {
         rb = obj.GetComponent<Rigidbody>();
         rb.isKinematic = true;
-        if(Verrify(hand))
+        if (Verrify(hand))
         {
+            print("ok");
             Switch(obj, ItemHand(hand), position, hand);
         }
         else
@@ -110,14 +117,32 @@ public class Player : MonoBehaviour
         if (Verrify(hand))
         {
             GameObject tmp = ItemHand(hand);
-            Drop(ItemHand(hand));
-            tmp.transform.SetParent(obj.transform);
-            tmp.transform.localPosition = position;
-            Remove(hand);
+            if (tmp != null)
+            {
+                Debug.Log($"Temp object to drop: {tmp.name}");
+
+                Drop(tmp);
+                Debug.Log($"Dropped object: {tmp.name}");
+
+                tmp.transform.SetParent(obj.transform);
+                Debug.Log($"Set parent to: {obj.name}");
+
+                tmp.transform.localPosition = position;
+                Debug.Log($"Local position set to: {position}");
+
+                Remove(hand);
+            }
+            else
+            {
+                Debug.LogError("Le jeu d'objets temporaire est nul.");
+            }
         }
         else
         {
-            print($"You have anything in your {hand} hand");
+            Debug.LogWarning($"You have nothing in your {hand} hand.");
         }
     }
+
+
+
 }

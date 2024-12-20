@@ -24,27 +24,21 @@ public class OnClick : MonoBehaviour
     [Header("Store")]
     [SerializeField] private Inv inv;
 
+    [Header("Store")]
+    [SerializeField] private GameManger game;
+
     private GameObject tmp;
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
 
     public void TakeLeft()
     {
-        player.AddHand(mouse.GetSelectObject(), "left", Vector3.left + new Vector3(0, 0, 3));
+        player.AddHand(mouse.GetSelectObject(), "left", Vector3.left + new Vector3(0, 0.5f, 2));
+        
         canvasTake.SetActive(false);
     }
 
     public void TakeRight()
     {
-        player.AddHand(mouse.GetSelectObject(), "right", Vector3.right + new Vector3(0, 0, 3));
+        player.AddHand(mouse.GetSelectObject(), "right", Vector3.right + new Vector3(0, 0.5f, 2));
         canvasTake.SetActive(false);
     }
 
@@ -75,9 +69,10 @@ public class OnClick : MonoBehaviour
         canvasPop.SetActive(false);
         canvasAdd.SetActive(false);
         canvasStore.SetActive(false);
-        canvasPlayer.SetActive(true);
+        mouse.SetPause(false);
         playerControl.IsReading();
         book.IsRecast(true);
+        game.SetCanvasUp(false);
     }
 
     public void AddRecipe()
@@ -85,8 +80,9 @@ public class OnClick : MonoBehaviour
         canvasAdd.SetActive(true);
         canvasPlayer.SetActive(false);
         playerControl.IsReading();
-
+        mouse.SetPause(true);
         book.IsRecast(false);
+        game.SetCanvasUp(true);
     }
 
     public void SaveRecipe()
@@ -117,8 +113,21 @@ public class OnClick : MonoBehaviour
     public void Open()
     {
         canvasStore.SetActive(true);
-        canvasPlayer.SetActive(true);
+        canvasPlayer.SetActive(false);
         playerControl.IsReading();
-        book.IsRecast(true);
+        book.IsRecast(false);
+        inv.SetOpen(true);
+        mouse.SetPause(true);
+        game.SetCanvasUp(true);
+    }
+
+    public void TakeStoreLeft() 
+    {
+        inv.Take("left", Vector3.left + new Vector3(0, 0, 3));
+    }
+
+    public void TakeStoreRight()
+    {
+        inv.Take("right", Vector3.right + new Vector3(0, 0, 3));
     }
 }

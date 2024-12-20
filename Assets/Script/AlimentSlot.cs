@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
+using UnityEngine.UI;
 
 public class AlimentSlot : MonoBehaviour, IPointerDownHandler
 {
@@ -11,14 +12,27 @@ public class AlimentSlot : MonoBehaviour, IPointerDownHandler
     [SerializeField] GameManger gameManger;
     private GameObject item;
 
+    private void Start()
+    {
+        Button button = GetComponent<Button>();
+        Sprite newSprite = Sprite.Create(
+            alimentData.img,
+            new Rect(0, 0, alimentData.img.width, alimentData.img.height),
+            new Vector2(0.5f, 0.5f)
+            
+        );
+        button.image.sprite = newSprite;
+    }
     public void OnPointerDown(PointerEventData eventData)
     {
         if (titleText != null && descriptionText != null)
         {
+            
             titleText.text = alimentData.titre;
             descriptionText.text = alimentData.description;
             gameManger.SetItem(alimentData.prefab);
             text.SetActive(true);
+            
         }
         else
         {

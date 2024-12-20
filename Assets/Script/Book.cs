@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.Windows;
+using System.IO; // Importation correcte de System.IO
 
 public class Book : MonoBehaviour
 {
@@ -14,6 +14,7 @@ public class Book : MonoBehaviour
 
     [SerializeField] List<Recette> recettes;
     [SerializeField] PlayerControl playerControl;
+    [SerializeField] GameManger game;
 
     [Header("Input Field")]
     [SerializeField] public TMP_InputField titleInputField;
@@ -28,8 +29,8 @@ public class Book : MonoBehaviour
 
     [Header("TextMeshPro")]
     [Tooltip("TextMeshPro pour afficher le nom de la recette")]
-    [SerializeField]  private TMP_Text nomRecetteText;
-    [SerializeField]  private TMP_Text nomRecetteTextPop;
+    [SerializeField] private TMP_Text nomRecetteText;
+    [SerializeField] private TMP_Text nomRecetteTextPop;
 
     [Tooltip("TextMeshPro pour afficher les ingrédients")]
     [SerializeField] private TMP_Text ingredientsText;
@@ -78,19 +79,17 @@ public class Book : MonoBehaviour
     {
         indexActuel = (indexActuel + 1) % recettes.Count;
         AfficherRecette(indexActuel, nomRecetteText, ingredientsText, preparationText);
-        print(indexActuel);
     }
 
     public void RecettePrecedente()
     {
-        indexActuel = (indexActuel - 1 + recettes.Count) % recettes.Count; 
+        indexActuel = (indexActuel - 1 + recettes.Count) % recettes.Count;
         AfficherRecette(indexActuel, nomRecetteText, ingredientsText, preparationText);
-        print(indexActuel);
     }
 
     private void SelectRecette()
     {
-        if(cast)
+        if (cast)
         {
             int layerMask = 1 << LayerMask.NameToLayer("Tv");
             if (UnityEngine.Input.GetMouseButtonDown(0))
@@ -115,6 +114,7 @@ public class Book : MonoBehaviour
                         playerControl.IsReading();
                         canvasPlayer.SetActive(false);
                         canvasPopUp.SetActive(true);
+                        game.SetCanvasUp(true);
                         AfficherRecette(indexActuel, nomRecetteTextPop, ingredientsTextPop, preparationTextPop);
                     }
                 }
@@ -130,9 +130,11 @@ public class Book : MonoBehaviour
         PlayerPrefs.DeleteKey(saveFolder + "/Recette" + indexActuel + "_preparation");
 
         SaveRecettes();
+        UpdateCanvas();
     }
 
-    public void IsRecast( bool active)
+
+    public void IsRecast(bool active)
     {
         cast = active;
     }
@@ -150,7 +152,7 @@ public class Book : MonoBehaviour
         {
             Directory.CreateDirectory(saveFolder);
         }
-        recettes.Add( newTextData );
+        recettes.Add(newTextData);
         SaveRecettes();
 
         ClearInputFields();
@@ -182,6 +184,22 @@ public class Book : MonoBehaviour
             index++;
         }
     }
+
+    private void UpdateCanvas()
+    {
+        if (recettes.Count > 0)
+        {
+            indexActuel = Mathf.Clamp(indexActuel, 0, recettes.Count - 1);
+            AfficherRecette(indexActuel, nomRecetteText, ingredientsText, preparationText);
+        }
+        else
+        {
+            nomRecetteText.text = string.Empty;
+            ingredientsText.text = string.Empty;
+            preparationText.text = string.Empty;
+        }
+    }
+
 
     private void ClearInputFields()
     {

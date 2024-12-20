@@ -11,9 +11,11 @@ GameObject:
   - component: {fileID: 1641217663033415792}
   - component: {fileID: 6252823966867645347}
   - component: {fileID: 8998735246449614451}
-  m_Layer: 0
+  - component: {fileID: -1190051485908874351}
+  - component: {fileID: -6993004898733763818}
+  m_Layer: 3
   m_Name: CarrotBody
-  m_TagString: Untagged
+  m_TagString: Target
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27,8 +29,8 @@ Transform:
   m_GameObject: {fileID: 221025165036704325}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -1, y: 0, z: 3}
+  m_LocalScale: {x: 0.35, y: 0.35, z: 0.35}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5018837931862522179}
@@ -84,6 +86,54 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!54 &-1190051485908874351
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 221025165036704325}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &-6993004898733763818
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 221025165036704325}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.62049645, y: 0.62049603, z: 1.0611575}
+  m_Center: {x: 0.0015714316, y: -0.0019270777, z: 0.080266096}
 --- !u!1 &7330703937542307723
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,7 +145,7 @@ GameObject:
   - component: {fileID: 5018837931862522179}
   - component: {fileID: 3155237589043572043}
   - component: {fileID: 5351057264045002705}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: CarrotLeaf
   m_TagString: Untagged
   m_Icon: {fileID: 0}

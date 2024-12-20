@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.InputSystem;
 
 
 
@@ -12,7 +13,7 @@ public class Inv : MonoBehaviour
     [System.Serializable]
     public class NestedList
     {
-        public List<ItemData> innerList;
+        public List<ItemData> innerList = new List<ItemData>();
         public void Add(ItemData item) { innerList.Add(item); }
     }
 
@@ -29,24 +30,30 @@ public class Inv : MonoBehaviour
     [SerializeField] private GameManger game;
     [SerializeField] private GameObject text;
     [SerializeField] private Player player;
+    [SerializeField] private bool random = false;
 
     private bool update = false;
 
     private List<Button> buttonList = new List<Button>();
     private List<GameObject> itemsAliment = new List<GameObject>();
     [SerializeField] private List<ItemData> totalItem = new List<ItemData>();
+    private List<NestedList> tmpItems = new List<NestedList>();
+    private bool isOpen = false;
 
     void Start()
     {
-        GenerateUI();
-        CreateButton();
+        GenerateUI(outerList);
+        CreateButton(outerList);
+        isOpen = true;
+        titleText.text = "";
+        descriptionText.text = "";
     }
 
 
-    public void CreateButton()
+    public void CreateButton(List<NestedList> _items)
     {
         ClearButtons();
-        for (int i = 0; i < outerList.Count; i++)
+        for (int i = 0; i < _items.Count; i++)
         {
             Button newButton = Instantiate(buttonPrefab, parentTransform);
 
@@ -66,30 +73,43 @@ public class Inv : MonoBehaviour
 
     private void Update()
     {
-        if (update)
+        if (random)
         {
-            GenerateUI();
-            CreateButton();
-            update = false;
+            if (isOpen)
+            {
+                print(random);
+                RandomList(tmpItems);
+                isOpen = false;
+            }
         }
+        else
+        {
+            if (update)
+            {
+                print("je suis la ");
+                GenerateUI(outerList);
+                CreateButton(outerList);
+                update = false;
+            }
+        }
+        
+        
     }
 
-    void GenerateUI()
+    void GenerateUI(List<NestedList> _itmes)
     {
         ClearUI();
-        for (int i = 0; i < outerList.Count; i++)
+        for (int i = 0; i < _itmes.Count; i++)
         {
-            NestedList nestedList = outerList[i];
+            NestedList nestedList = _itmes[i];
             GameObject container = Instantiate(containerPrefab, parentTransformItem);
 
             foreach (ItemData itemData in nestedList.innerList)
             {
                 GameObject buttonGO = Instantiate(buttonPrefabItem, container.transform);
                 buttonGO.name = $"Button_{i}_{nestedList.innerList.IndexOf(itemData)}";
-                print(buttonGO.name);
                 if (!HasDigitInName(buttonGO.name))
                 {
-                    print("okk");
                     buttonGO.SetActive(false);
                 }
 
@@ -112,11 +132,15 @@ public class Inv : MonoBehaviour
             {
                 if (!HasDigitInName(child.name))
                 {
-                    print($"Child '{child.name}' does not contain a digit. Removing...");
                     Destroy(child.gameObject);
                 }
             }
         }
+    }
+
+    public void SetRandom(bool _bool)
+    {
+        random = _bool;
     }
 
     bool HasDigitInName(string name)
@@ -156,11 +180,8 @@ public class Inv : MonoBehaviour
     {
         if (player.Verrify(hand))
         {
-            print(outerList.Count);
             for (int i = 0; i < totalItem.Count; i++)
             {
-                /*print(totalItem[i].prefab);
-                print(data);*/
                 if (data.name == totalItem[i].prefab.name)
                 {
                     int rand = Random.Range(0, outerList.Count);
@@ -170,11 +191,43 @@ public class Inv : MonoBehaviour
                     update = true;
                     return;
                 }
-                /*else
-                {
-                    print("this Object can't store");
-                }*/
             }
         }
+    }
+
+    private void RandomList(List<NestedList> _itmes)
+    {
+        _itmes.Clear();
+        int randCount = Random.Range(1, 4);
+        for (int i = 0; i < randCount ; i++) 
+        {
+            NestedList nested = new NestedList();
+            int randSize = Random.Range(1, 8);
+            for (int j = 0; j < randSize; j++)
+            {
+                int rand = Random.Range(0, totalItem.Count);
+                nested.Add(totalItem[rand]);
+            }
+            _itmes.Add(nested);
+        }
+        GenerateUI(_itmes);
+        CreateButton(_itmes);
+
+
+    }
+    public void Take(string hand, Vector3 vec)
+    {
+        GameObject item = Instantiate(game.GetItem(), player.transform);
+        if (item.name.Contains("(Clone)"))
+        {
+            item.name = item.name.Replace("(Clone)", "").Trim();
+            Debug.Log($"Le GameObject a été renommé en : {item.name}");
+        }
+        player.AddHand(item, hand, vec);
+    }
+
+    public void SetOpen(bool _bool)
+    {
+        isOpen = _bool;
     }
 }

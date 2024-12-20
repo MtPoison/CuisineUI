@@ -33,7 +33,7 @@ public class PlayerControl : MonoBehaviour
 
     private void OnEnable()
     {
-        deplacements = playerControler.Player.Move;
+        deplacements = playerControler.Player.Move; 
         deplacements.Enable();
     }
 

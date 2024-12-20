@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   titre: Carrot
   prefab: {fileID: 221025165036704325, guid: bdcb1163aaa701e47a05799e04111331, type: 3}
+  img: {fileID: 2800000, guid: 61dae29f28ea3f54c8c281e5af316f17, type: 3}
   description: Carrot
