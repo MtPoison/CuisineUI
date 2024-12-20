@@ -53,10 +53,9 @@ public class PlayerControl : MonoBehaviour
         
     }
 
-    public bool IsReading() 
+    public void IsReading(bool _bool) 
     { 
         readRecette = !readRecette; 
-        return readRecette; 
     }
 
     private void Move()

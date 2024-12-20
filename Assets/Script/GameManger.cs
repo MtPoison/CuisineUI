@@ -21,12 +21,14 @@ public class GameManger : MonoBehaviour
     [SerializeField] private GameObject canvasPop;
     [SerializeField] private GameObject canvasAdd;
     [SerializeField] private GameObject canvasStore;
+    [SerializeField] private GameObject text;
 
     private GameObject item;
     private bool canvasUp;
     void Start()
     {
         canvas.SetActive(false);
+        text.SetActive(false);
     }
 
     void Update()
@@ -49,8 +51,9 @@ public class GameManger : MonoBehaviour
                 canvasAdd.SetActive(false);
                 canvasStore.SetActive(false);
                 mouse.SetPause(false);
-                playerControl.IsReading();
+                playerControl.IsReading(false);
                 book.IsRecast(true);
+                text.SetActive(false);
                 canvasUp = false;
             }
         }

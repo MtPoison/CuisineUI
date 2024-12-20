@@ -111,7 +111,7 @@ public class Book : MonoBehaviour
 
                     if (!isButtonClicked && !isLayerCorrect && results.Count > 0)
                     {
-                        playerControl.IsReading();
+                        playerControl.IsReading(true);
                         canvasPlayer.SetActive(false);
                         canvasPopUp.SetActive(true);
                         game.SetCanvasUp(true);
@@ -141,6 +141,14 @@ public class Book : MonoBehaviour
 
     public void AddRecette()
     {
+        if (string.IsNullOrWhiteSpace(titleInputField.text) ||
+            string.IsNullOrWhiteSpace(descriptionInputField.text) ||
+            string.IsNullOrWhiteSpace(authorInputField.text))
+        {
+            Debug.Log("Tous les champs doivent être remplis avant d'ajouter une recette !");
+            return;
+        }
+
         cast = false;
         Recette newTextData = ScriptableObject.CreateInstance<Recette>();
 
@@ -157,6 +165,7 @@ public class Book : MonoBehaviour
 
         ClearInputFields();
     }
+
 
     private void SaveRecettes()
     {

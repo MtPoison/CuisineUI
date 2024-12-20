@@ -4,12 +4,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.InputSystem;
 
-
-
-
 public class Inv : MonoBehaviour
 {
-
     [System.Serializable]
     public class NestedList
     {
@@ -19,19 +15,16 @@ public class Inv : MonoBehaviour
 
     [SerializeField] private Button buttonPrefab;
     [SerializeField] private Transform parentTransform;
-    [SerializeField] private Dictionary<int, ItemData> items;
     [SerializeField] private GameObject buttonPrefabItem;
     [SerializeField] private GameObject containerPrefab;
     [SerializeField] private Transform parentTransformItem;
     [SerializeField] private List<NestedList> outerList;
-
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private GameManger game;
     [SerializeField] private GameObject text;
     [SerializeField] private Player player;
     [SerializeField] private bool random = false;
-
     private bool update = false;
 
     private List<Button> buttonList = new List<Button>();
@@ -45,10 +38,8 @@ public class Inv : MonoBehaviour
         GenerateUI(outerList);
         CreateButton(outerList);
         isOpen = true;
-        titleText.text = "";
-        descriptionText.text = "";
+        UpdateText();
     }
-
 
     public void CreateButton(List<NestedList> _items)
     {
@@ -56,17 +47,19 @@ public class Inv : MonoBehaviour
         for (int i = 0; i < _items.Count; i++)
         {
             Button newButton = Instantiate(buttonPrefab, parentTransform);
-
-            Text buttonLabel = newButton.GetComponentInChildren<Text>();
+            TextMeshProUGUI buttonLabel = newButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonLabel != null)
             {
-                buttonLabel.text = $"bouton_{i}";
+                buttonLabel.text = $"shel {i+1}";
             }
             ShelfButton shel = newButton.GetComponent<ShelfButton>();
-            shel.SetShel(itemsAliment[i]);
-            shel.SetTitleText(titleText);
-            shel.SetDescription(descriptionText);
-            shel.SetGame(game);
+            if (shel != null)
+            {
+                shel.SetShel(itemsAliment[i]);
+                shel.SetTitleText(titleText);
+                shel.SetDescription(descriptionText);
+                shel.SetGame(game);
+            }
             buttonList.Add(newButton);
         }
     }
@@ -77,23 +70,26 @@ public class Inv : MonoBehaviour
         {
             if (isOpen)
             {
-                print(random);
-                RandomList(tmpItems);
+                UpdateText();
+                RandomList();
                 isOpen = false;
             }
         }
         else
         {
-            if (update)
+            if (isOpen)
             {
-                print("je suis la ");
-                GenerateUI(outerList);
-                CreateButton(outerList);
-                update = false;
+                NormalList();
+                isOpen = false;
             }
         }
-        
-        
+    }
+
+    void NormalList()
+    {
+        UpdateText();
+        GenerateUI(outerList);
+        CreateButton(outerList);
     }
 
     void GenerateUI(List<NestedList> _itmes)
@@ -155,7 +151,6 @@ public class Inv : MonoBehaviour
         return false;
     }
 
-
     void ClearUI()
     {
         foreach (GameObject container in itemsAliment)
@@ -174,8 +169,6 @@ public class Inv : MonoBehaviour
         buttonList.Clear();
     }
 
-
-
     public void Drop(GameObject data, string hand)
     {
         if (player.Verrify(hand))
@@ -185,7 +178,6 @@ public class Inv : MonoBehaviour
                 if (data.name == totalItem[i].prefab.name)
                 {
                     int rand = Random.Range(0, outerList.Count);
-
                     outerList[rand].Add(totalItem[i]);
                     player.Remove(hand);
                     update = true;
@@ -195,11 +187,11 @@ public class Inv : MonoBehaviour
         }
     }
 
-    private void RandomList(List<NestedList> _itmes)
+    private void RandomList()
     {
-        _itmes.Clear();
+        tmpItems.Clear();
         int randCount = Random.Range(1, 4);
-        for (int i = 0; i < randCount ; i++) 
+        for (int i = 0; i < randCount; i++)
         {
             NestedList nested = new NestedList();
             int randSize = Random.Range(1, 8);
@@ -208,13 +200,12 @@ public class Inv : MonoBehaviour
                 int rand = Random.Range(0, totalItem.Count);
                 nested.Add(totalItem[rand]);
             }
-            _itmes.Add(nested);
+            tmpItems.Add(nested);
         }
-        GenerateUI(_itmes);
-        CreateButton(_itmes);
-
-
+        GenerateUI(tmpItems);
+        CreateButton(tmpItems);
     }
+
     public void Take(string hand, Vector3 vec)
     {
         GameObject item = Instantiate(game.GetItem(), player.transform);
@@ -229,5 +220,11 @@ public class Inv : MonoBehaviour
     public void SetOpen(bool _bool)
     {
         isOpen = _bool;
+    }
+
+    public void UpdateText()
+    {
+        titleText.text = "";
+        descriptionText.text = "";
     }
 }

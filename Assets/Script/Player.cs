@@ -56,7 +56,6 @@ public class Player : MonoBehaviour
 
         obj.transform.localPosition = position;
 
-
         Debug.Log($"{obj.name} a été ajouté en tant qu'enfant du joueur.");
     }
 
@@ -71,11 +70,11 @@ public class Player : MonoBehaviour
 
     public void Drop(GameObject obj)
     {
-        print("coucou");
         obj.transform.parent = null;
-        obj.GetComponent<Collider>().enabled = true;
+        obj.GetComponent<Collider>().enabled = true; 
         rb = obj.GetComponent<Rigidbody>();
         rb.isKinematic = false;
+
     }
 
     public GameObject ItemHand(string hand)
@@ -97,6 +96,7 @@ public class Player : MonoBehaviour
     public void AddHand(GameObject obj, string hand, Vector3 position)
     {
         rb = obj.GetComponent<Rigidbody>();
+        obj.GetComponent<Collider>().enabled = false;
         rb.isKinematic = true;
         if (Verrify(hand))
         {
@@ -107,7 +107,7 @@ public class Player : MonoBehaviour
         {
             Add(obj, hand);
             AddAsChild(obj, position);
-            obj.GetComponent<Collider>().enabled = false;
+            
         }
         
     }
@@ -142,7 +142,6 @@ public class Player : MonoBehaviour
             Debug.LogWarning($"You have nothing in your {hand} hand.");
         }
     }
-
 
 
 }

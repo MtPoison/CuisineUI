@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 2064960237284803465}
   - component: {fileID: -199613136869979787}
   - component: {fileID: 613021861665610712}
+  - component: {fileID: 4378786735928225481}
   m_Layer: 3
   m_Name: chicken_Raw
   m_TagString: Target
@@ -218,6 +219,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.4917488, y: 1.0591084, z: 1.98789}
   m_Center: {x: -0.00000059604645, y: -0.10389535, z: -0.08000639}
+--- !u!114 &4378786735928225481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4643466584054242252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03f740a45d6653c4fb5cb39521dbc905, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  "d\xE9calage": 0.5
 --- !u!1 &8475585270840908827
 GameObject:
   m_ObjectHideFlags: 0

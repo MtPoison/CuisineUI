@@ -14,29 +14,36 @@ public class AlimentSlot : MonoBehaviour, IPointerDownHandler
 
     private void Start()
     {
+        titleText.text = "";
+        descriptionText.text = "";
         Button button = GetComponent<Button>();
-        Sprite newSprite = Sprite.Create(
-            alimentData.img,
-            new Rect(0, 0, alimentData.img.width, alimentData.img.height),
-            new Vector2(0.5f, 0.5f)
-            
-        );
-        button.image.sprite = newSprite;
+        if (button != null)
+        {
+            Sprite newSprite = Sprite.Create(
+                alimentData.img,
+                new Rect(0, 0, alimentData.img.width, alimentData.img.height),
+                new Vector2(0.5f, 0.5f)
+            );
+            button.image.sprite = newSprite;
+        }
+        else
+        {
+            Debug.LogWarning("Button component missing on " + gameObject.name);
+        }
     }
+
     public void OnPointerDown(PointerEventData eventData)
     {
         if (titleText != null && descriptionText != null)
         {
-            
             titleText.text = alimentData.titre;
             descriptionText.text = alimentData.description;
             gameManger.SetItem(alimentData.prefab);
             text.SetActive(true);
-            
         }
         else
         {
-            Debug.LogWarning("TitleText ou DescriptionText n'est pas assigné dans l'inspecteur !");
+            Debug.LogWarning("TitleText or DescriptionText is not assigned in the inspector!");
         }
     }
 
@@ -66,7 +73,7 @@ public class AlimentSlot : MonoBehaviour, IPointerDownHandler
         this.gameManger = game;
     }
 
-    public void SetText(GameObject _text) 
+    public void SetText(GameObject _text)
     {
         text = _text;
     }
@@ -78,4 +85,3 @@ public class AlimentSlot : MonoBehaviour, IPointerDownHandler
 
     public GameObject getItem() { return item; }
 }
-

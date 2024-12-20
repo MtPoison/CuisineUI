@@ -7,25 +7,30 @@ public class MouseControler : MonoBehaviour
     private Camera mainCamera;
     private GameObject hoveredObject;
     private GameObject selectObject;
+    private Material hoverMaterial;
     private Shader outlineShader;
     private Shader originalShader;
-    private RaycastHit hit;
+
+    [SerializeField] private Shader hoverShader;
+    [SerializeField] private Material defaultMaterial;
 
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject canvasTake;
     [SerializeField] private GameObject canvasDrop;
     [SerializeField] private GameObject canvasStore;
 
-    [SerializeField] private float distanceAhead = 2.0f;
-    [SerializeField] private float heightOffset = 150;
-    [SerializeField] private float distanceLeft = 2.0f;
+    
     [SerializeField] private Inv inv;
 
+    private int combinedLayerMask;
     private bool pause = false;
 
     void Start()
     {
         mainCamera = Camera.main;
+        combinedLayerMask = (1 << LayerMask.NameToLayer("Food")) |
+                            (1 << LayerMask.NameToLayer("Recipiant")) |
+                            (1 << LayerMask.NameToLayer("Store"));
 
         outlineShader = Shader.Find("Custom/HighlightShader");
         if (outlineShader == null)
@@ -60,102 +65,100 @@ public class MouseControler : MonoBehaviour
         if (pause) return;
 
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        bool anyHovered = false;
 
-        /*int combinedLayerMask = (1 << LayerMask.NameToLayer("Food")) |
-                                (1 << LayerMask.NameToLayer("Recipiant")) |
-                                (1 << LayerMask.NameToLayer("Store"));*/
-        int layer1Mask = 1 << LayerMask.NameToLayer("Food");
-        int layer2Mask = 1 << LayerMask.NameToLayer("Recipiant");
-        int layer3Mask = 1 << LayerMask.NameToLayer("Store");
-
-        // Vérifiez les objets sous le pointeur
-        Raycast(ray, layer1Mask, canvasTake, 0, 0.75f) ;
-        Raycast(ray, layer3Mask, canvasStore, 3f, 3f);
-        Raycast(ray, layer2Mask, canvasDrop, 0, 1.5f);
-        
-    }
-
-    private void Raycast(Ray _ray, int layerMask, GameObject canvas, float _x, float _y)
-    {
-        if (Physics.Raycast(_ray, out RaycastHit hit, Mathf.Infinity, layerMask))
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, combinedLayerMask))
         {
-            if (hoveredObject != hit.collider.gameObject)
-            {
-                if (hoveredObject != null)
-                {
-                }
+            GameObject targetObject = hit.collider.gameObject;
 
-                hoveredObject = hit.collider.gameObject;
-                
+            if (hoveredObject != targetObject)
+            {
+                ResetHoveredObject();
+                hoveredObject = targetObject;
+
+                if (hoverShader != null)
+                {
+                    hoverMaterial = new Material(hoverShader);
+                    hoverMaterial.EnableKeyword("_EMISSION");
+                    hoveredObject.GetComponent<Renderer>().material = hoverMaterial;
+                }
             }
+            anyHovered = true;
 
             if (Input.GetMouseButtonDown(0))
             {
                 selectObject = hoveredObject;
-
-                // Vérifiez les interactions
                 if (selectObject.name == "refrigerator_2")
                 {
-                    Debug.Log("L'objet sélectionné est refrigerator_2.");
                     inv.SetRandom(true);
                 }
                 else
                 {
-                    Debug.Log("Autre objet sélectionné.");
                     inv.SetRandom(false);
                 }
 
-                if (!IsMouseOverUI())
+                int hitLayer = hit.collider.gameObject.layer;
+                if (hitLayer == LayerMask.NameToLayer("Food"))
                 {
-                    if (canvas != null)
-                    {
-                        if (canvas.activeSelf)
-                            canvas.SetActive(false);
-                        else
-                            MoveCanva(selectObject, canvas, _x, _y);
-                    }
+                    HandleCanvas(canvasTake, selectObject, 0, 0.75f);
+                }
+                else if (hitLayer == LayerMask.NameToLayer("Recipiant"))
+                {
+                    HandleCanvas(canvasDrop, selectObject, 0, 1.5f);
+                }
+                else if (hitLayer == LayerMask.NameToLayer("Store"))
+                {
+                    HandleCanvas(canvasStore, selectObject, 3f, 3f);
                 }
             }
         }
         else
         {
-            if (hoveredObject != null)
-            {
-                hoveredObject = null;
-            }
+            ResetHoveredObject();
 
             if (Input.GetMouseButtonDown(0) && !IsMouseOverUI())
             {
-                if (canvas != null) canvas.SetActive(false);
+                DeactivateAllCanvases();
+            }
+        }
+
+        if (!anyHovered && hoverMaterial != null)
+        {
+            hoverMaterial.DisableKeyword("_EMISSION");
+        }
+    }
+
+
+    void ResetHoveredObject()
+    {
+        if (hoveredObject != null && defaultMaterial != null)
+        {
+            hoveredObject.GetComponent<Renderer>().material = defaultMaterial;
+        }
+        hoveredObject = null;
+    }
+
+    void HandleCanvas(GameObject canvas, GameObject target, float offsetX, float offsetY)
+    {
+        if (!IsMouseOverUI())
+        {
+            DeactivateAllCanvases();
+
+            if (canvas != null && !canvas.activeSelf)
+            {
+                MoveCanvas(target, canvas, offsetX, offsetY);
             }
         }
     }
 
-    void ApplyOutline(GameObject obj)
+    private void DeactivateAllCanvases()
     {
-        Renderer renderer = obj.GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            originalShader = renderer.material.shader;
-            renderer.material.shader = outlineShader;
-        }
-        else
-        {
-            Debug.LogWarning($"L'objet {obj.name} n'a pas de Renderer !");
-        }
+        if (canvasTake != null) canvasTake.SetActive(false);
+        if (canvasDrop != null) canvasDrop.SetActive(false);
+        if (canvasStore != null) canvasStore.SetActive(false);
     }
 
-    void RemoveOutline(GameObject obj)
-    {
-        Renderer renderer = obj.GetComponent<Renderer>();
-        if (renderer != null && originalShader != null)
-        {
-            renderer.material.shader = originalShader;
-        }
-    }
-
-
-    void MoveCanva(GameObject target, GameObject _canvas, float _x, float _y)
+    void MoveCanvas(GameObject target, GameObject _canvas, float _x, float _y)
     {
         if (_canvas != null && target != null)
         {
